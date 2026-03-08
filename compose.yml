@@ -1,6 +1,6 @@
 services:
   rocketchat:
-    image: ${IMAGE:-registry.rocket.chat/rocketchat/rocket.chat}:${RELEASE:-8.0.1}
+    image: ${IMAGE:-registry.rocket.chat/rocketchat/rocket.chat}:${RELEASE:-8.0.2}
     restart: always
     labels:
       prometheus.io/scrape: "true"
@@ -36,12 +36,15 @@ services:
         done;
         echo "=====> Giving up waiting for MongoDB after 5 minutes";
         exit 1
+    networks:
+      - default
+      - web
     expose:
       - ${PORT:-3000}
       - ${METRICS_PORT:-9458}
-    ports:
-      - "${BIND_IP:-0.0.0.0}:${HOST_PORT:-3000}:${PORT:-3000}"
-      - "${BIND_IP:-0.0.0.0}:${METRICS_PORT:-9458}:${METRICS_PORT:-9458}"
+    #ports:
+    #  - "${BIND_IP:-0.0.0.0}:${HOST_PORT:-3000}:${PORT:-3000}"
+    #  - "${BIND_IP:-0.0.0.0}:${METRICS_PORT:-9458}:${METRICS_PORT:-9458}"
     logging:
       driver: "json-file"
     # healthcheck:
@@ -50,3 +53,10 @@ services:
     #   timeout: 10s
     #   retries: 10
     #   start_period: 30s
+    labels:
+      caddy: ${DOMAIN}
+      caddy.reverse_proxy: "{{upstreams http 3000}}"
+
+networks:
+  web:
+    external: true

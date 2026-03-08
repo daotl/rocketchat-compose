@@ -139,4 +139,9 @@ services:
       - --compatible-mode
 
 volumes:
-  mongodb_data: {driver: local}
+  mongodb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUMES_ROOT}/mongodb
+      o: bind
